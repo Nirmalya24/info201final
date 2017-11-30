@@ -6,14 +6,19 @@ library(shinyjs)
 #setwd("/Users/aviralsharma/Desktop/INFO201/info201final")
 
 raw.data <- read.csv("./data/child-mortality-by-sex.csv")
+map.data <- read.csv("./data/child-mortality.csv", stringsAsFactors = FALSE)
 
 #This line removes all the rows which contains null values inthe male and female column
 raw.data <- na.omit(raw.data)
+
+
 #Renaming all the column names so as to make the column names much shorter an dreadable
 colnames(raw.data)[1] <- "Country"
 colnames(raw.data)[4] <- "Female-Ratio"
 colnames(raw.data)[5] <- "Male-Ratio"
 colnames(raw.data)[6] <- "Total-Population"
+
+colnames(map.data)[4] <- "MortalityRate"
 
 
 my.server <- function(input, output) {
@@ -26,7 +31,31 @@ my.server <- function(input, output) {
     shinyjs::hide("button")
     counter$countervalue <- counter$countervalue + 1 
   })
-
+  
+  output$worldmap <- renderPlotly({
+    #removes all the uears that weren't equal to the user input
+    map.data <- map.data[map.data$Year == input$years, ]
+    l <- list(color = toRGB("grey"), width = 0.5)
+    
+    # specify map projection/options
+    g <- list(
+      showframe = TRUE,
+      showcoastlines = TRUE,
+      projection = list(type = 'Mercator')
+    )
+    p <- plot_geo(map.data) %>%
+      add_trace(
+        z = ~map.data$MortalityRate, color = ~map.data$MortalityRate, colors = 'Greens',
+        text = ~map.data$Entity, locations = ~map.data$Code, marker = list(line = l)
+      ) %>%
+      colorbar(title = 'Child-Mortality (per 1,000 live births)', ticksuffix = '%') %>%
+      layout(
+        title = 'Child Mortality',
+        geo = g
+      )
+    return(p)
+  })
+  
   #Takes the user input of the country name and gender for eithe rone or two countries and creates a scatter plot to show the child mortality rate
   #based on gender
   output$plot <- renderPlotly({
@@ -39,7 +68,7 @@ my.server <- function(input, output) {
       result.two <- raw.data %>% filter(raw.data$Country == input$ChildCountry2)
       if(gender.selection == "Male") {
         chart <- plot_ly(data = result.one, y = result.one$`Male-Ratio`, x = result.one$Year, type = 'scatter', mode = 'lines', name = input$ChildCountry)  %>% 
-               add_trace( y = result.two$`Male-Ratio`, x = result.two$Year, name = input$ChildCountry2 ) 
+          add_trace( y = result.two$`Male-Ratio`, x = result.two$Year, name = input$ChildCountry2 ) 
       } else if(gender.selection == "Female") {
         chart <- plot_ly(data = result.one, y = result.one$`Female-Ratio`, x = result.one$Year, type = 'scatter', mode = 'lines', name = input$ChildCountry)  %>% 
           add_trace( y = result.two$`Female-Ratio`, x = result.two$Year, name = input$ChildCountry2 )

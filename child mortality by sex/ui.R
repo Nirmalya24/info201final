@@ -2,7 +2,7 @@
 library(shiny)
 library(plotly)
 library(shinyjs)
-
+            
 #setwd("/Users/aviralsharma/Desktop/INFO201/info201final")
 
 raw.data <- read.csv("./data/child-mortality-by-sex.csv")
@@ -15,6 +15,8 @@ colnames(raw.data)[4] <- "Female-Ratio"
 colnames(raw.data)[5] <- "Male-Ratio"
 colnames(raw.data)[6] <- "Total-Population"
 
+
+
 ui <- navbarPage(
   #Application 
   "Child Mortality Viz",
@@ -25,19 +27,26 @@ ui <- navbarPage(
            )
   ),
   tabPanel("Map",
-           sidebarLayout(
-             sidebarPanel(
-               sliderInput("years",
-                           "Choose year",
-                           min = 1990,
-                           max = 2015,
-                           value = 2000)
-             ),
-             
+           fluidPage(
              # Show a plot of the generated distribution
-             mainPanel(
-               #plotlyOutput("distPlot")
-               #strong(textOutput("summary"))
+             fluidRow(
+               column(12, div(style = "height:200px"),
+                      mainPanel(plotlyOutput("worldmap")),
+                      fluidRow(
+                        column(12, div(style = "height:100px"), 
+                               hr(), 
+                               fluidRow(column(12, sidebarPanel(
+                                 sliderInput("years", "Choose year",
+                                             min = 1751,
+                                             max = 2015,
+                                             sep = "",
+                                             value = 1950,
+                                             animate =
+                                               animationOptions(interval = 300, loop = FALSE))))
+                               )
+                        )
+                      )
+               )
              )
            )
   ),
