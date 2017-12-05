@@ -97,7 +97,7 @@ ui <- navbarPage(
   
   tabPanel("Global child death causes",
            mainPanel(
-             #strong(textOutput("summary2"))
+             plotlyOutput("areaGraph")
            )
   )
 )

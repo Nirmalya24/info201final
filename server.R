@@ -1,24 +1,28 @@
-
 library(shiny)
 library(plotly)
 library(shinyjs)
+library(tidyr)
+library(dplyr)
 
 #setwd("/Users/aviralsharma/Desktop/INFO201/info201final")
 
 raw.data <- read.csv("./data/child-mortality-by-sex.csv")
 map.data <- read.csv("./data/child-mortality.csv", stringsAsFactors = FALSE)
-
+causes.data <- read.csv("./data/global-child-deaths-by-cause.csv", stringsAsFactors = FALSE)
 #This line removes all the rows which contains null values inthe male and female column
 raw.data <- na.omit(raw.data)
 
 
-#Renaming all the column names so as to make the column names much shorter an dreadable
+#Renaming all the column names so as to make the column names much shorter and readable
+#Raw data rename
 colnames(raw.data)[1] <- "Country"
 colnames(raw.data)[4] <- "Female-Ratio"
 colnames(raw.data)[5] <- "Male-Ratio"
 colnames(raw.data)[6] <- "Total-Population"
-
+#Map data rename
 colnames(map.data)[4] <- "MortalityRate"
+#causes data rename
+colnames(causes.data) <- c("Entity", "Code", "Year", "Deaths", "Population")
 
 
 my.server <- function(input, output) {
@@ -110,6 +114,19 @@ my.server <- function(input, output) {
   
   output$table.info <- renderText({
     return("SUMMARY STATISTICS OF CHILD MORTALITY RATE BY GENDER")
+  })
+  
+  output$areaGraph <- renderPlotly({
+    
+    df <- causes.data %>% select(Entity, Year, Deaths) %>% filter(Deaths >= 0)
+    df <- spread(df, Year, Deaths) #converting it from long to wide
+    
+    p <- plot_ly(x = df$Entity, y = df$'1990', type = 'scatter', mode = 'lines', name = '1990', fill = 'tozeroy', height=500) %>%
+      add_trace(x = df$Entity, y = df$'2015', name = '2015', fill = 'tozeroy') %>%
+      layout(xaxis = list(title = "Leading Causes", showticklabels = FALSE),
+             yaxis = list(title = 'Number of Deaths'), hovermode = 'compare')
+    
+    return(p)
   })
   
 }
