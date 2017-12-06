@@ -30,4 +30,7 @@ Looking at a fair number of instances, we can infer that in most countries, over
 ##Fertility Rate Combined with Child Mortality
 This visualization represents the total number of children a woman gave birth to that were victims of child mortality (died before the age of 5). One can view the contrast regarding different countries, i.e. the number of children lost by a woman in different countries over time. 
 
+The slider allows the user to select the time period and the drop-down menu lets the user select the country. The line density plot then displays the comparison between the number of children that survived above the age of 5 (per woman) vs. the number children that did not survive above the age of 5 (per woman). The **Y-axis represents the frequency of children per woman** and the **X-axis represents the year span**.
+Let us take the preset example of *Sweden*. The graph shows us that during the 1800-1900 period, on an average a **Swedish woman had more than 5** children and the mortality rates show that at an average **each woman lost at least 1 child**. Comparing it to the later period of 2000, on an average each **Swedish woman lost 0.005 children**. 
+
 
