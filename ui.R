@@ -2,11 +2,14 @@
 library(shiny)
 library(plotly)
 library(shinyjs)
+library(readr)
+library(sm)
             
 #setwd("/Users/aviralsharma/Desktop/INFO201/info201final")
 
-raw.data <- read.csv("../data/child-mortality-by-sex.csv")
-
+raw.data <- read.csv("./data/child-mortality-by-sex.csv")
+data <- read.csv("./data/Children-woman-death-vs-survival.csv", stringsAsFactors = FALSE)
+countries <- unique(data$Entity, incomparables = FALSE, fromLast = FALSE, nmax = NA)
 #This line removes all the rows which contains null values inthe male and female column
 raw.data <- na.omit(raw.data)
 #Renaming all the column names so as to make the column names much shorter an dreadable
@@ -22,8 +25,24 @@ ui <- navbarPage(
   "Child Mortality Viz",
   useShinyjs(),
   tabPanel("Introduction",
-           mainPanel(
-             #strong(textOutput("summary2"))
+           sidebarLayout(
+             # side panel
+             sidebarPanel(
+               
+               sliderInput('introYears',                # key this value will be assigned to
+                           "Years",                # label
+                           min = 1800,             # minimum slider value
+                           max = 2015,             # maximum slider value
+                           sep = "",
+                           value = c(1800, 2015)   # starting value
+               )
+             ),
+             
+             #main panel
+             mainPanel(
+               #plotting output
+               plotlyOutput("introPlot")
+             )
            )
   ),
   tabPanel("Map",
@@ -51,15 +70,29 @@ ui <- navbarPage(
            )
   ),
   tabPanel("Infant Mortality",
+           #Layout
            sidebarLayout(
+             # side panel
              sidebarPanel(
-               selectInput("infantCountry", label = h3("Select Country"), 
-                           choices = list("Choice 1" = 1, "Choice 2" = 2, "Choice 3" = 3), 
-                           selected = 1)
                
+               sliderInput('roleYears',                # key this value will be assigned to
+                           "Years",                # label
+                           min = 1800,             # minimum slider value
+                           max = 2015,             # maximum slider value
+                           sep="",
+                           value = c(1800, 2015)   # starting value
+               ),
+               #country
+               selectInput(inputId = "country",
+                           label = "Country:",
+                           choices = countries,
+                           selected = "Sweden")
              ),
+             
+             #main panel
              mainPanel(
-               #strong(textOutput("summary2"))
+               #plotting output
+               plotlyOutput("rolePlot")
              )
            )
   ),

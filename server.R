@@ -3,12 +3,16 @@ library(plotly)
 library(shinyjs)
 library(tidyr)
 library(dplyr)
+library(readr)
+library(sm)
 
 #setwd("/Users/aviralsharma/Desktop/INFO201/info201final")
 
 raw.data <- read.csv("./data/child-mortality-by-sex.csv")
 map.data <- read.csv("./data/child-mortality.csv", stringsAsFactors = FALSE)
 causes.data <- read.csv("./data/global-child-deaths-by-cause.csv", stringsAsFactors = FALSE)
+intro.data <- read.csv("./data/global-child-mortality-timeseries.csv", stringsAsFactors = FALSE)
+data1 <- read.csv("./data/Children-woman-death-vs-survival.csv", stringsAsFactors = FALSE)
 #This line removes all the rows which contains null values inthe male and female column
 raw.data <- na.omit(raw.data)
 
@@ -127,6 +131,47 @@ my.server <- function(input, output) {
              yaxis = list(title = 'Number of Deaths'), hovermode = 'compare')
     
     return(p)
+  })
+  
+  output$introPlot <- renderPlotly({
+    #x axis will contain years based on user input
+    #y axis will contain percent of population
+    data <- intro.data %>% filter(Year >= input$introYears[1] & Year <= input$introYears[2])
+    plot_ly(data, x = ~Year, y = ~Share.surviving.first.5.years.of.life....+ Share.dying.in.first.5.years.... , name = 'Share surviving ',
+            type = 'scatter', mode = 'none', fill = 'tozeroy', fillcolor = '#F5FF8D',
+            text = ~paste0(Year, '<br>Share surviving: ', Share.surviving.first.5.years.of.life....,
+                           '<br>Share dying: ', Share.dying.in.first.5.years....)) %>%
+      add_trace(y = ~Share.dying.in.first.5.years...., name = 'Share dying', fillcolor = '#50CB86') %>%
+      
+      layout(title = 'Global Child Mortality',
+             xaxis = list(title = "",
+                          showgrid = FALSE),
+             yaxis = list(title = "Percent",
+                          showgrid = FALSE,
+                          ticksuffix = '%'))
+    
+  })
+
+  output$rolePlot <- renderPlotly({
+    #x axis will contain years based on user input
+    #y axis will contain percent of population
+    data2 <- data1 %>% filter(Year >= input$roleYears[1] & Year <= input$roleYears[2])  %>% filter(Entity == input$country)
+    plot_ly(data2, x = ~Year, y = ~Children.that.survived.past.their.5th.birthday.per.woman..children.
+            + Children.that.died.before.5.years.of.age.per.woman..Children.that.died.before.5.years.of.age.per.woman. ,
+            name = 'died ', type = 'scatter', mode = 'none', fill = 'tozeroy', fillcolor = 'red',
+            text = ~paste0(Year, ' ', Children.that.survived.past.their.5th.birthday.per.woman..children.
+                           + Children.that.died.before.5.years.of.age.per.woman..Children.that.died.before.5.years.of.age.per.woman.,
+                           '<br>Children that died before five years of age per woman: ', Children.that.died.before.5.years.of.age.per.woman..Children.that.died.before.5.years.of.age.per.woman.,
+                           '<br>Children that survived after five years of age per woman: ',
+                           Children.that.survived.past.their.5th.birthday.per.woman..children.)) %>%
+      add_trace(y = ~Children.that.survived.past.their.5th.birthday.per.woman..children., name = 'survived', fillcolor = '#50CB86') %>%
+      
+      layout(title = 'How many children did a woman give birth to that died before their 5th birthday?',
+             xaxis = list(title = "",
+                          showgrid = FALSE),
+             yaxis = list(title = "Children per woman",
+                          showgrid = FALSE))
+    
   })
   
 }

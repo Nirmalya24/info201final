@@ -7,7 +7,7 @@ library("sm")
 
 
 #read in data
-data1 <- read.csv("../data/Children-woman-death-vs-survival.csv", stringsAsFactors = FALSE)
+role.data <- read.csv("../data/Children-woman-death-vs-survival.csv", stringsAsFactors = FALSE)
 
 shinyServer(function(input, output) {
   
@@ -16,8 +16,8 @@ shinyServer(function(input, output) {
   output$rolePlot <- renderPlotly({
     #x axis will contain years based on user input
     #y axis will contain percent of population
-    data2 <- data1 %>% filter(Year >= input$years[1] & Year <= input$years[2])  %>% filter(Entity == input$country)
-    plot_ly(data2, x = ~Year, y = ~Children.that.survived.past.their.5th.birthday.per.woman..children.
+    plot.data <- role.data %>% filter(Year >= input$years[1] & Year <= input$years[2])  %>% filter(Entity == input$country)
+    plot_ly(plot.data, x = ~Year, y = ~Children.that.survived.past.their.5th.birthday.per.woman..children.
             + Children.that.died.before.5.years.of.age.per.woman..Children.that.died.before.5.years.of.age.per.woman. ,
             name = 'died ', type = 'scatter', mode = 'none', fill = 'tozeroy', fillcolor = 'red',
             text = ~paste0(Year, ' ', Children.that.survived.past.their.5th.birthday.per.woman..children.
