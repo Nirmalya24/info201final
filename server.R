@@ -45,11 +45,11 @@ my.server <- function(input, output) {
     g <- list(
       showframe = TRUE,
       showcoastlines = TRUE,
-      projection = list(type = 'Mercator')
+      projection = list(type = 'mollweide')
     )
     p <- plot_geo(map.data) %>%
       add_trace(
-        z = ~map.data$MortalityRate, color = ~map.data$MortalityRate, colors = 'Greens',
+        z = ~map.data$MortalityRate, color = ~map.data$MortalityRate, colors = 'Reds',
         text = ~map.data$Entity, locations = ~map.data$Code, marker = list(line = l)
       ) %>%
       colorbar(title = 'Child-Mortality (per 1,000 live births)', ticksuffix = '%') %>%
@@ -121,8 +121,8 @@ my.server <- function(input, output) {
     df <- causes.data %>% select(Entity, Year, Deaths) %>% filter(Deaths >= 0)
     df <- spread(df, Year, Deaths) #converting it from long to wide
     
-    p <- plot_ly(x = df$Entity, y = df$'1990', type = 'scatter', mode = 'lines', name = '1990', fill = 'tozeroy', height=500) %>%
-      add_trace(x = df$Entity, y = df$'2015', name = '2015', fill = 'tozeroy') %>%
+    p <- plot_ly(x = df$Entity, y = df$'2015', type = 'scattergl', mode = 'lines', name = '2015', fill = 'tozeroy') %>%
+      add_trace(x = df$Entity, y = df$'1990', name = '1990', fill = 'tozeroy') %>%
       layout(xaxis = list(title = "Leading Causes", showticklabels = FALSE),
              yaxis = list(title = 'Number of Deaths'), hovermode = 'compare')
     
