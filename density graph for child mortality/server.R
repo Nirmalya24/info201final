@@ -14,7 +14,7 @@ data2 <- data1 %>% mutate(Share.surviving.first.5.years.of.life.... = Share.surv
 shinyServer(function(input, output) {
   
   #plotName same as plot name in the UI
-  output$rolePlot <- renderPlot({
+  output$rolePlot <- renderPlotly({
     #x axis will contain years based on user input
     #y axis will contain percent of population
     data <- data1 %>% filter(Year >= input$years[1] & Year <= input$years[2])
