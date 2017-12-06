@@ -5,7 +5,7 @@ library(shinyjs)
             
 #setwd("/Users/aviralsharma/Desktop/INFO201/info201final")
 
-raw.data <- read.csv("./data/child-mortality-by-sex.csv")
+raw.data <- read.csv("../data/child-mortality-by-sex.csv")
 
 #This line removes all the rows which contains null values inthe male and female column
 raw.data <- na.omit(raw.data)
