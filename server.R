@@ -6,13 +6,21 @@ library(dplyr)
 library(readr)
 library(sm)
 
-#setwd("/Users/aviralsharma/Desktop/INFO201/info201final")
 
+
+#reading all the necessary files to create the correct data frames
+#the files are:
+#child-mortality-by-sex.csv
+#child-mortality.csv
+#global-child-death-by-cause.csv
+#global-child-mortality-timeseries.csv
+#Children-woman-death-vs-survival.csv
 raw.data <- read.csv("./data/child-mortality-by-sex.csv")
 map.data <- read.csv("./data/child-mortality.csv", stringsAsFactors = FALSE)
 causes.data <- read.csv("./data/global-child-deaths-by-cause.csv", stringsAsFactors = FALSE)
 intro.data <- read.csv("./data/global-child-mortality-timeseries.csv", stringsAsFactors = FALSE)
 data1 <- read.csv("./data/Children-woman-death-vs-survival.csv", stringsAsFactors = FALSE)
+
 #This line removes all the rows which contains null values inthe male and female column
 raw.data <- na.omit(raw.data)
 
@@ -40,8 +48,9 @@ my.server <- function(input, output) {
     counter$countervalue <- counter$countervalue + 1 
   })
   
+  #This creates a time series map that shows the status of the globalchild mortality rate
   output$worldmap <- renderPlotly({
-    #removes all the uears that weren't equal to the user input
+    #removes all the years that weren't equal to the user input
     map.data <- map.data[map.data$Year == input$years, ]
     l <- list(color = toRGB("grey"), width = 0.5)
     
@@ -64,7 +73,7 @@ my.server <- function(input, output) {
     return(p)
   })
   
-  #Takes the user input of the country name and gender for eithe rone or two countries and creates a scatter plot to show the child mortality rate
+  #Takes the user input of the country name and gender for eithe one or two countries and creates a scatter plot to show the child mortality rate
   #based on gender
   output$plot <- renderPlotly({
     #Getting the first country name
@@ -116,15 +125,20 @@ my.server <- function(input, output) {
     return(statitics)
   })   
   
+  #returns the name of certain diseases that lead to death among children
   output$diseases <- renderTable({
     df <- causes.data %>% select(Entity, Year, Deaths) %>% filter(Deaths >= 0)
     df <- spread(df, Year, Deaths) #converting it from long to wide
     return(df[1:14, "Entity"])
   })
+  
+  #header line
   output$table.info <- renderText({
     return("SUMMARY STATISTICS OF CHILD MORTALITY RATE BY GENDER")
   })
   
+  #This returns the area graph showing informtion about what diseases lead to death among 
+  #children and compares its effect from 1990 to 2015
   output$areaGraph <- renderPlotly({
     
     df <- causes.data %>% select(Entity, Year, Deaths) %>% filter(Deaths >= 0)
@@ -138,6 +152,9 @@ my.server <- function(input, output) {
     return(p)
   })
   
+  
+  #This is  a graph that we show on our introductory page which gives the user a brief understanding
+  #about the child mortality rate in each country (based on the user's input)
   output$introPlot <- renderPlotly({
     #x axis will contain years based on user input
     #y axis will contain percent of population
@@ -157,6 +174,8 @@ my.server <- function(input, output) {
     
   })
 
+  #this returns an area graph compares the percentage of children that survived their 5ht birthday
+  #and those who didnt based on a country
   output$rolePlot <- renderPlotly({
     #x axis will contain years based on user input
     #y axis will contain percent of population
@@ -179,12 +198,14 @@ my.server <- function(input, output) {
     
   })
   
+  #bried summary about the graph regarding infant mortality
   output$fertility.intro <- renderText({
     return("This visualization represents the total number of children a woman gave birth to that were victims of child 
             mortality (died before the age of 5). One can view the contrast regarding different countries, 
             i.e. the number of children lost by a woman in different countries over time")
   })
   
+  #bried summary about the graph regarding infant mortality
   output$fertility.summary <- renderText({
     return("The slider allows the user to select the time period and the drop-down menu lets the user select the country. 
             The line density plot then displays the comparison between the number of children that survived above the age
@@ -192,6 +213,7 @@ my.server <- function(input, output) {
             The Y-axis represents the frequency of children per woman and the X-axis represents the year span")
   })
   
+  #introductory paragraph
   output$intro <- renderText({
     return("Child Mortality has been a social issue that has been ever-present in the society. Simply defined, it is the 
            rate of deaths of children below 5 years of age. Child mortality is dependent on a number of factors varying 
@@ -210,6 +232,7 @@ my.server <- function(input, output) {
            take better decisions regarding policies in the future.")
   })
   
+  #bried summary about the graph regarding causes of child mortality
   output$causes <- renderText({
     return("This visualization displays the global freqeuncy of child deaths and their causes in the form of an area-filled
             graph. The frequency of deaths are on the Y-axis whereas their respective causes are on the X-axis. This visualization
@@ -222,6 +245,7 @@ my.server <- function(input, output) {
               in the availability of vaccinations. ")
   })
   
+  #bried summary about the graph regarding global child mortality
   output$map.info <- renderText({
     return("In the time series plot we try to showcase child mortality over the long run. Today child mortality in industrialized 
            countries is below 0.5%. The time series plot shows that these low mortality rates are a very recent development, 
@@ -230,6 +254,7 @@ my.server <- function(input, output) {
            – but child mortality is still much higher than in developed countries")
   })
   
+  #bried summary about the graph regarding child mortality based on gender
   output$gender <- renderText({
     return("This visualization represents the child mortality rate in the form of a line plot. One can select a country
              and view the child mortality rates of boys or girls or even compare the child mortality rates between
@@ -237,6 +262,23 @@ my.server <- function(input, output) {
             ranging from 1990 to 2010. Looking at a fair number of instances, we can infer that in most countries, 
             over the recent years, the child mortality rates within boys has consistenty been greater than that of girls.
            ")
+  })
+  
+  #Inference about the visualisation behind the graph talking about causes of child mortality
+  output$causes.inference <- renderText({
+    return("INFERENCE: From this data visualization, it is easy to point out which diseases in the current day and age are the
+           major reasons behind the death of children and thus appropritae actions can be taken to fight them, including but 
+           not limited to : 1) spreading awareness about how to prevent the spread of the diseases
+                            2) openning up vacinnation stalls in places in the most effected places")
+  })
+  
+  #Inference: time series world map
+  output$world.inderence <- renderText({
+    return("INFERENCE: From this data visualization, it is easy to point out which countries still have a major problem
+           regarding child mortality and need immediate assistance. As a result, appropriate actions can be taken quickly
+           so as to prevent further harm from happening. This map also manages to tell us that as countries begin to progress,
+           the rate of child mortality decreaes accordingly. This tells us how important it is to improve the living standards
+           in order to tackle this dreadful problem")
   })
   
 }
